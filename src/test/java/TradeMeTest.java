@@ -1,13 +1,14 @@
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import pages.HomePage;
+import pages.ResultsPage;
 
 
 import java.util.List;
@@ -16,7 +17,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TradeMeTest {
 
+    private HomePage homePage;
     private WebDriver driver;
+    private ResultsPage resultsPage;
+
 
     @BeforeAll
     public static void setupClass() {
@@ -27,6 +31,7 @@ public class TradeMeTest {
     public void setupBrowser() {
         driver = new ChromeDriver();
         driver.get("https://www.tmsandbox.co.nz/");
+        homePage = new HomePage(driver);
 
     }
 
@@ -39,15 +44,12 @@ public class TradeMeTest {
 
     @Test
     public void checkTitle() {
-        assertEquals("Google", driver.getTitle());
+        assertEquals("TRADEME SANDBOX - Buy online and sell with NZ's #1 auction & classifieds site | Trade Me SANDBOX", driver.getTitle());
     }
 
     @Test
     public void testGoldSendKeys() throws Exception {
-        WebElement queryBox = driver.findElement(By.cssSelector("#searchString"));
-        queryBox.sendKeys("gold");
-        queryBox.sendKeys(Keys.RETURN);
-
+        homePage.searchFor("gold");
         Thread.sleep(5000);
     }
 
@@ -63,7 +65,6 @@ public class TradeMeTest {
     public void testGoldClick() throws Exception {
         WebElement queryBox = driver.findElement(By.cssSelector("#searchString"));
         queryBox.sendKeys("gold");
-
         WebElement submitButton = driver.findElement(By.cssSelector("#generalSearch > div.field.field-right > button"));
         submitButton.click();
         Thread.sleep(5000);
@@ -71,33 +72,26 @@ public class TradeMeTest {
 
     @Test
     public void printOutNumberOfListings() throws InterruptedException {
-        WebElement queryBox = driver.findElement(By.cssSelector("#searchString"));
-        queryBox.sendKeys("gold");
-        queryBox.sendKeys(Keys.RETURN);
-        Thread.sleep(5000);
-        String listingCount = driver.findElement(By.id("totalCount")).getText();
-        assertEquals(listingCount, "26", "Checking for the number of listings");
+        resultsPage = homePage.searchFor("gold");
+        int listingCount = resultsPage.getTotalCount();
+        assertEquals(listingCount, "27", "Checking for the number of listings");
     }
+
 
     @Test
     public void printOutPriceCurrentItem() throws InterruptedException {
-        WebElement queryBox = driver.findElement(By.cssSelector("#searchString"));
-        queryBox.sendKeys("gold");
-        queryBox.sendKeys(Keys.RETURN);
+        homePage.searchFor("gold");
         Thread.sleep(5000);
 
         String listingPriceTop = driver.findElement(By.cssSelector("#SuperGridGallery_BucketList_ClassifiedPrice_listingClassifiedPriceAmountPoa"))
                 .getText();
-
         System.out.println(listingPriceTop);
         assertEquals(listingPriceTop, "Price by negotiation", "Checking for the price of the top listing");
     }
 
     @Test
     public void clickOnTheListView() throws InterruptedException {
-        WebElement queryBox = driver.findElement(By.cssSelector("#searchString"));
-        queryBox.sendKeys("gold");
-        queryBox.sendKeys(Keys.RETURN);
+        homePage.searchFor("gold");
         Thread.sleep(5000);
 
         WebElement listView = driver.findElement(By.cssSelector("#ListingViewBar_listViewTab_icon_a"));
@@ -107,9 +101,7 @@ public class TradeMeTest {
 
     @Test
     public void ListTopTen() throws InterruptedException {
-        WebElement queryBox = driver.findElement(By.cssSelector("#searchString"));
-        queryBox.sendKeys("gold");
-        queryBox.sendKeys(Keys.RETURN);
+        homePage.searchFor("gold");
 //        Thread.sleep(5000);
         WebDriverWait wait = new WebDriverWait(driver, 10);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#Footer_FooterLinks_announcementsLink")));
@@ -130,9 +122,7 @@ public class TradeMeTest {
 
     @Test
     public void testGoldSendKeysExplicitWait() throws Exception {
-        WebElement queryBox = driver.findElement(By.cssSelector("#searchString"));
-        queryBox.sendKeys("gold");
-        queryBox.sendKeys(Keys.RETURN);
+        homePage.searchFor("gold");
 
         WebDriverWait wait = new WebDriverWait(driver, 10);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#Footer_FooterLinks_announcementsLink")));
@@ -141,9 +131,7 @@ public class TradeMeTest {
 
     @Test
     public void testGoldSendKeysSortLowest() throws Exception {
-        WebElement queryBox = driver.findElement(By.cssSelector("#searchString"));
-        queryBox.sendKeys("gold");
-        queryBox.sendKeys(Keys.RETURN);
+        homePage.searchFor("gold");
 
 
         WebDriverWait wait = new WebDriverWait(driver, 10);
@@ -156,7 +144,6 @@ public class TradeMeTest {
 
         WebElement listView = driver.findElement(By.cssSelector("#ListingViewBar_listViewTab_icon_a"));
         listView.click();
-//        Thread.sleep(5000);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#Footer_FooterLinks_announcementsLink")));
 
         List<WebElement> topThree = driver.findElements(By.cssSelector("#SuperListView_BucketList_BidInfo_listingBidPrice"));
