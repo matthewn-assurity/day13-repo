@@ -3,5 +3,5 @@ Feature: Search Count
 
   Scenario: Search for Gold items shows count
     Given I am conducting a TradeMe search
-    When I search for "Gold"
+    When I search for "Car"
     Then I see 27 results
